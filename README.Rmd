@@ -147,23 +147,27 @@ model_data = combine_output(tf)
 
 head(model_data)
 ```
-
+#LEFT OFF HERE
 
 ## Testing time_frame without writing output to files
 
 If you want to simply test `time_frame`, you may prefer not to write your output to file. You can accomplish this by setting `output_file` to `FALSE`.
 
 ```{r}
-tf %>% 
-  add_rolling_predictors(variables = 'cr',
-                         lookback = hours(12), 
-                         window = hours(6), 
-                         stats = c(mean = mean,
-                                   min = min,
-                                   max = max,
-                                   median = median,
-                                   length = length),
-                         output_file = FALSE) %>% 
+tf %>%
+  add_rolling_predictors(
+    variables = 'cr',
+    lookback = hours(12),
+    window = hours(6),
+    stats = c(
+      mean = mean,
+      min = min,
+      max = max,
+      median = median,
+      length = length
+    ),
+    output_file = FALSE
+  ) %>%
   head()
 ```
 
