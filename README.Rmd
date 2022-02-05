@@ -47,20 +47,23 @@ future::plan('multisession')
 
 unlink(file.path(tempdir(), 'gpmodels_dir', '*.*'))
 
-tf = time_frame(fixed_data = sample_fixed_data,
-               temporal_data = sample_temporal_data %>% dplyr::filter(id %in% 1:100),
-               fixed_id = 'id',
-               fixed_start = 'admit_time',
-               fixed_end = 'dc_time',
-               temporal_id = 'id',
-               temporal_time = 'time',
-               temporal_variable = 'variable',
-               temporal_category = 'category',
-               temporal_value = 'value',
-               step = hours(6),
-               max_length = days(7), # optional parameter to limit to first 7 days of hospitalization
-               output_folder = file.path(tempdir(), 'gpmodels_dir'),
-               create_folder = TRUE)
+tf = time_frame(
+  fixed_data = sample_fixed_data,
+  temporal_data = sample_temporal_data %>% dplyr::filter(id %in% 1:100),
+  fixed_id = 'id',
+  fixed_start = 'admit_time',
+  fixed_end = 'dc_time',
+  temporal_id = 'id',
+  temporal_time = 'time',
+  temporal_variable = 'variable',
+  temporal_category = 'category',
+  temporal_value = 'value',
+  step = hours(6),
+  max_length = days(7),
+  # optional parameter to limit to first 7 days of hospitalization
+  output_folder = file.path(tempdir(), 'gpmodels_dir'),
+  create_folder = TRUE
+)
 
 ```
 
@@ -82,7 +85,7 @@ tf$temporal_data_dict
 
 
 ```{r}
-tf = tf %>% 
+tf = tf %>%
   pre_dummy_code()
 ```
 
@@ -174,22 +177,26 @@ tf %>%
 ## You can also supply a vector of variables
 
 ```{r}
-tf %>% 
-  add_rolling_predictors(variables = c('cr', 'med_aspirin'),
-                         lookback = weeks(1), 
-                         stats = c(length = length),
-                         output_file = FALSE) %>% 
+tf %>%
+  add_rolling_predictors(
+    variables = c('cr', 'med_aspirin'),
+    lookback = weeks(1),
+    stats = c(length = length),
+    output_file = FALSE
+  ) %>%
   head()
 ```
 
 ## Category accepts regular expressions
 
 ```{r}
-tf %>% 
-  add_rolling_predictors(category = 'lab|med',
-                         lookback = hours(12), 
-                         stats = c(length = length),
-                         output_file = FALSE) %>% 
+tf %>%
+  add_rolling_predictors(
+    category = 'lab|med',
+    lookback = hours(12),
+    stats = c(length = length),
+    output_file = FALSE
+  ) %>%
   head()
 ```
 
@@ -202,17 +209,21 @@ benchmark_results = list()
 
 # future::plan('multisession')
 
-benchmark_results[['multisession']] = 
+benchmark_results[['multisession']] =
   microbenchmark::microbenchmark(
-    tf %>% 
-      add_rolling_predictors(variable = 'cr',
-                             lookback = hours(48), 
-                             window = hours(6), 
-                             stats = c(mean = mean,
-                                       min = min,
-                                       max = max,
-                                       median = median,
-                                       length = length)),
+    tf %>%
+      add_rolling_predictors(
+        variable = 'cr',
+        lookback = hours(48),
+        window = hours(6),
+        stats = c(
+          mean = mean,
+          min = min,
+          max = max,
+          median = median,
+          length = length
+        )
+      ),
     times = 1
   )
 ```
@@ -224,17 +235,21 @@ benchmark_results[['multisession']] =
 tf_with_chunks = tf
 tf_with_chunks$chunk_size = 20
 
-benchmark_results[['multisession with chunk_size 20']] = 
+benchmark_results[['multisession with chunk_size 20']] =
   microbenchmark::microbenchmark(
-    tf_with_chunks %>% 
-      add_rolling_predictors(variable = 'cr',
-                             lookback = hours(48), 
-                             window = hours(6), 
-                             stats = c(mean = mean,
-                                       min = min,
-                                       max = max,
-                                       median = median,
-                                       length = length)),
+    tf_with_chunks %>%
+      add_rolling_predictors(
+        variable = 'cr',
+        lookback = hours(48),
+        window = hours(6),
+        stats = c(
+          mean = mean,
+          min = min,
+          max = max,
+          median = median,
+          length = length
+        )
+      ),
     times = 1
   )
 ```
@@ -244,18 +259,22 @@ benchmark_results[['multisession with chunk_size 20']] =
 ```{r message=FALSE}
 future::plan('sequential')
 
-benchmark_results[['sequential']] = 
+benchmark_results[['sequential']] =
   microbenchmark::microbenchmark(
-  tf %>% 
-    add_rolling_predictors(variable = 'cr',
-                           lookback = hours(48), 
-                           window = hours(6), 
-                           stats = c(mean = mean,
-                                     min = min,
-                                     max = max,
-                                     median = median,
-                                     length = length)),
-  times = 1
+    tf %>%
+      add_rolling_predictors(
+        variable = 'cr',
+        lookback = hours(48),
+        window = hours(6),
+        stats = c(
+          mean = mean,
+          min = min,
+          max = max,
+          median = median,
+          length = length
+        )
+      ),
+    times = 1
   )
 
 ```
