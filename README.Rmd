@@ -102,27 +102,38 @@ The default method writes output to the folder defined in your `time_frame`. Whe
 If, however, you set `output_file` to `FALSE`, then your actual output is returned (rather than the `time_frame`) so you cannot chain functions.
 
 ```{r}
-tf %>%           
-  add_rolling_predictors(variables = 'cr', # Note: You can supply a vector of variables
-                         lookback = hours(12), 
-                         window = hours(6), 
-                         stats = c(mean = mean,
-                                   min = min,
-                                   max = max,
-                                   median = median,
-                                   length = length)) %>%
-  add_baseline_predictors(variables = 'cr', # add baseline creatinine
-                          lookback = days(90),
-                          offset = hours(10),
-                          stats = c(min = min)) %>%
+tf %>%
+  add_rolling_predictors(
+    variables = 'cr',
+    # Note: You can supply a vector of variables
+    lookback = hours(12),
+    window = hours(6),
+    stats = c(
+      mean = mean,
+      min = min,
+      max = max,
+      median = median,
+      length = length
+    )
+  ) %>%
+  add_baseline_predictors(
+    variables = 'cr',
+    # add baseline creatinine
+    lookback = days(90),
+    offset = hours(10),
+    stats = c(min = min)
+  ) %>%
   add_growing_predictors(variables = 'cr', # cumulative max creatinine since admission
                          stats = c(max = max)) %>%
-  add_rolling_predictors(category = 'med', # Note: category is always a regular expression 
+  add_rolling_predictors(category = 'med',
+                         # Note: category is always a regular expression
                          lookback = days(7),
-                         stats = c(sum = sum)) %>% 
-  add_rolling_outcomes(variables = 'cr',
-                       lookahead = hours(24), 
-                       stats = c(max = max))
+                         stats = c(sum = sum)) %>%
+  add_rolling_outcomes(
+    variables = 'cr',
+    lookahead = hours(24),
+    stats = c(max = max)
+  )
 ```
 
 ## Let's combine our output into a single data frame
